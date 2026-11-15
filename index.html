@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Personal expense tracker dashboard" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Expense Tracker</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-icon">◈</span>
+        <div>
+          <h1>Expense Tracker</h1>
+          <p>PERSONAL FINANCE</p>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <a href="#dashboard" class="nav-item" data-view="dashboard"><span class="ico">▣</span>Dashboard</a>
+        <a href="#transactions" class="nav-item" data-view="transactions"><span class="ico">▤</span>Transactions</a>
+        <a href="#analytics" class="nav-item" data-view="analytics"><span class="ico">◉</span>Analytics</a>
+        <a href="#categories" class="nav-item" data-view="categories"><span class="ico">▦</span>Categories</a>
+        <a href="#settings" class="nav-item" data-view="settings"><span class="ico">⚙</span>Settings</a>
+      </nav>
+
+      <a href="#settings" class="budget-card" id="budgetCard" title="Edit budget in Settings">
+        <span class="budget-label">Monthly budget</span>
+        <strong class="budget-amount" id="budgetAmount">₹ 0</strong>
+        <div class="progress"><div class="progress-bar" id="budgetBar"></div></div>
+        <span class="budget-note" id="budgetNote">—</span>
+      </a>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+        <div class="greeting">
+          <h2 id="greeting">Good evening!</h2>
+          <p id="subGreeting">Here's your financial overview.</p>
+        </div>
+        <div class="top-actions">
+          <label class="search">
+            <span aria-hidden="true">⌕</span>
+            <input type="search" id="searchInput" placeholder="Search transactions" autocomplete="off" />
+          </label>
+          <button class="btn primary" id="addBtn">＋ <span>Add</span></button>
+          <button type="button" class="profile" id="profileBtn" aria-haspopup="dialog"><span class="avatar" id="avatar">U</span><span id="profileName">Profile</span></button>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section class="view" id="view-dashboard">
+        <div class="stats">
+          <article class="card stat">
+            <span class="stat-bar blue"></span>
+            <div>
+              <p class="stat-label">TOTAL BALANCE</p>
+              <h3 class="stat-value" id="statBalance">₹ 0</h3>
+              <p class="stat-change" id="chgBalance"></p>
+            </div>
+          </article>
+          <article class="card stat">
+            <span class="stat-bar green"></span>
+            <div>
+              <p class="stat-label">TOTAL INCOME</p>
+              <h3 class="stat-value" id="statIncome">₹ 0</h3>
+              <p class="stat-change" id="chgIncome"></p>
+            </div>
+          </article>
+          <article class="card stat">
+            <span class="stat-bar red"></span>
+            <div>
+              <p class="stat-label">TOTAL EXPENSES</p>
+              <h3 class="stat-value" id="statExpense">₹ 0</h3>
+              <p class="stat-change" id="chgExpense"></p>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <h3 class="card-title">Monthly spending</h3>
+            <p class="card-sub">Expenses over the last 6 months</p>
+            <div id="barChart" class="chart"></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title">Expenses by category</h3>
+                <p class="card-sub" id="donutSub">This month</p>
+              </div>
+              <select id="donutScope" class="select small" aria-label="Scope">
+                <option value="month">This month</option>
+                <option value="all">All time</option>
+              </select>
+            </div>
+            <div id="donutChart" class="donut-wrap"></div>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card-head">
+            <h3 class="card-title">Recent transactions</h3>
+            <a href="#transactions" class="link">View all →</a>
+          </div>
+          <div class="table-wrap" id="recentTable"></div>
+        </article>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="view" id="view-transactions" hidden>
+        <article class="card">
+          <div class="card-head wrap">
+            <h3 class="card-title">All transactions</h3>
+            <div class="toolbar">
+              <select id="fType" class="select">
+                <option value="all">All types</option>
+                <option value="expense">Expenses</option>
+                <option value="income">Income</option>
+              </select>
+              <select id="fCategory" class="select"></select>
+              <select id="fMonth" class="select"></select>
+              <select id="fSort" class="select">
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="amount-desc">Amount: high → low</option>
+                <option value="amount-asc">Amount: low → high</option>
+              </select>
+              <button class="btn" id="exportCsv">⬇ CSV</button>
+            </div>
+          </div>
+          <p class="card-sub" id="txSummary"></p>
+          <div class="table-wrap" id="txTable"></div>
+        </article>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="view" id="view-analytics" hidden>
+        <div class="stats four" id="kpis"></div>
+        <div class="grid-2">
+          <article class="card">
+            <h3 class="card-title">Income vs expenses</h3>
+            <p class="card-sub">Last 6 months</p>
+            <div id="compareChart" class="chart"></div>
+            <div class="legend-inline">
+              <span><i style="background:var(--green)"></i>Income</span>
+              <span><i style="background:var(--blue)"></i>Expenses</span>
+            </div>
+          </article>
+          <article class="card">
+            <h3 class="card-title">Top categories</h3>
+            <p class="card-sub">Spending this month</p>
+            <div id="topCats"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- CATEGORIES -->
+      <section class="view" id="view-categories" hidden>
+        <article class="card">
+          <h3 class="card-title">Add a category</h3>
+          <form id="catForm" class="inline-form">
+            <input type="text" id="catName" class="input" placeholder="Category name" maxlength="24" required />
+            <input type="color" id="catColor" class="color" value="#3b82f6" aria-label="Colour" />
+            <button class="btn primary" type="submit">Add category</button>
+          </form>
+        </article>
+        <div class="cat-grid" id="catGrid"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings" hidden>
+        <div class="grid-2">
+          <article class="card">
+            <h3 class="card-title">Profile &amp; budget</h3>
+            <form id="settingsForm" class="form">
+              <label>Your name
+                <input type="text" id="setName" class="input" maxlength="30" placeholder="e.g. Aman" />
+              </label>
+              <label>Monthly budget
+                <input type="number" id="setBudget" class="input" min="0" step="100" placeholder="8000" />
+              </label>
+              <label>Currency symbol
+                <input type="text" id="setCurrency" class="input" maxlength="3" placeholder="₹" />
+              </label>
+              <button class="btn primary" type="submit">Save settings</button>
+            </form>
+          </article>
+          <article class="card">
+            <h3 class="card-title">Your data</h3>
+            <p class="card-sub">Everything is stored in this browser (localStorage). Nothing is sent anywhere.</p>
+            <div class="stack">
+              <button class="btn" id="exportJson">⬇ Backup (JSON)</button>
+              <label class="btn file">⬆ Restore backup<input type="file" id="importJson" accept="application/json" hidden /></label>
+              <button class="btn" id="loadSample">Load sample data</button>
+              <button class="btn danger" id="clearAll">Delete all data</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="card-head">
+        <h3 class="card-title" id="modalTitle">Add transaction</h3>
+        <button class="icon-btn" id="modalClose" aria-label="Close">✕</button>
+      </div>
+      <form id="txForm" class="form" novalidate>
+        <div class="segmented" id="typeToggle">
+          <button type="button" data-type="expense" class="active">Expense</button>
+          <button type="button" data-type="income">Income</button>
+        </div>
+        <label>Description
+          <input type="text" id="txDesc" class="input" maxlength="60" placeholder="e.g. Groceries" required />
+        </label>
+        <div class="row">
+          <label>Amount
+            <input type="number" id="txAmount" class="input" min="0.01" step="0.01" placeholder="0.00" required />
+          </label>
+          <label>Date
+            <input type="date" id="txDate" class="input" required />
+          </label>
+        </div>
+        <label id="catLabel">Category
+          <select id="txCategory" class="select full"></select>
+        </label>
+        <p class="error" id="txError" role="alert"></p>
+        <div class="row end">
+          <button type="button" class="btn" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn primary" id="txSubmit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE MODAL ============ -->
+  <div class="modal" id="profileModal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <div class="card-head">
+        <h3 class="card-title" id="profileTitle">Profile</h3>
+        <button class="icon-btn" id="profileClose" aria-label="Close">✕</button>
+      </div>
+      <div class="profile-head">
+        <span class="avatar big" id="profileAvatar">U</span>
+        <div>
+          <h4 id="profileFullName">Guest</h4>
+          <p class="card-sub" id="profileSince">Personal finance account</p>
+        </div>
+      </div>
+      <div class="profile-stats" id="profileStats"></div>
+      <form id="profileForm" class="form">
+        <label>Display name
+          <input type="text" id="profileInput" class="input" maxlength="30" placeholder="Enter your name" />
+        </label>
+        <div class="row end">
+          <a href="#settings" class="btn" id="profileSettings">Open settings</a>
+          <button type="submit" class="btn primary">Save name</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
